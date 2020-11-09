@@ -1,6 +1,9 @@
 from tkinter import *
 
 
+# fg="#F2AA4C",bg="#101820",
+#old bg #E3F2FD
+
 class Gui:
     def __init__(self, master):
         self.master = master  # The master attribute gives access to the root window (Tk)
@@ -15,45 +18,90 @@ class Gui:
         self.mainframe.grid_columnconfigure(1, weight=1)
 
         # make Frames (container) that go into mainframe
-        self.right_frame_temperatuur = Frame(self.mainframe, bg="red")
-        self.right_frame = Frame(self.mainframe, bg="lightgrey")
-        self.left_frame = Frame(self.mainframe, bg="white", width=100)
-        self.left_frame.grid(row=0, column=0, sticky="ns")
-        self.right_frame_temperatuur.grid(row=0, column=1, sticky="nsew")
+        # right side frames
+        self.right_frame = Frame(self.mainframe, bg="white")
+        self.right_frame_rolluik = Frame(self.mainframe, bg="white")
+        self.right_frame_temperatuur = Frame(self.mainframe, bg="white")
         self.right_frame.grid(row=0, column=1, sticky="nsew")
+        self.right_frame_rolluik.grid(row=0, column=1, sticky="nsew")
+        self.right_frame_temperatuur.grid(row=0, column=1, sticky="nsew")
 
-        # make text
+        # left side frames
+        self.left_frame = Frame(self.mainframe, bg="#101820", width=100)
+        self.left_frame.grid(row=0, column=0, sticky="ns")
+
+
+
+
+        # make frames
+        self.makeRolluikFrame()
         self.makeLeftFrame()
-
-        # make buttons
-        self.makeBtns()
+        self.makeRightHomeFrame()
+        self.makeRightTemperatuurFrame()
+        self.raiseHome()
 
     def raiseTemperatuur(self):
         self.right_frame_temperatuur.tkraise()
 
-    def makeBtns(self):
-        self.btn_temp = Button(self.left_frame, text="Temperatuur / Licht", fg="black", width=25, height=5)
-        self.btn_licht = Button(self.left_frame, text="Rolluik", fg="black", width=25, height=5)
-        self.btn_home = Button(self.left_frame, text="Home", fg="black", width=5, height=1,
-                               command=self.raiseTemperatuur)
+    def raiseHome(self):
+        self.right_frame.tkraise()
 
-        # pack buttons in window
-        self.btn_temp.pack(side=TOP, padx=(30, 30), pady=(10, 0))
-        self.btn_licht.pack(side=TOP, padx=(30, 30), pady=(20, 0))
-        self.btn_home.pack(side=LEFT, anchor="sw", padx=(30, 30), pady=(20, 20))
+    def raiseRolluikFrame(self):
+        self.right_frame_rolluik.tkraise()
 
     def makeLeftFrame(self):
-        self.label_instellingen = Label(self.left_frame, text="Instellingen", bg="white", font=("DejaVu Sans", 20, "bold"))
+        # Buttons
+        self.btn_temp = Button(self.left_frame, text="Temperatuur / Licht", fg="#101820", width=25, height=5, command=self.raiseTemperatuur)
+        self.btn_rolluik = Button(self.left_frame, text="Rolluik", fg="black", width=25, height=5,command=self.raiseRolluikFrame)
+        self.btn_test = Button(self.left_frame, text=".", fg="black", width=1, height=1)
 
-        # Home label
+        # labels
+        self.label_instellingen = Label(self.left_frame, text="Instellingen", fg="#F2AA4C", bg="#101820", relief=FLAT,font=("DejaVu Sans", 20, "bold"))
+        self.label_instellingen = Label(self.left_frame, text="Instellingen", fg="#F2AA4C", bg="#101820", relief=FLAT,font=("DejaVu Sans", 20, "bold"))
+
+        # packs
+        self.label_instellingen.pack(side=TOP, padx=(30, 30), pady=(20, 0))
+        self.btn_temp.pack(side=TOP, padx=(30, 30), pady=(10, 0))
+        self.btn_rolluik.pack(side=TOP, padx=(30, 30), pady=(20, 0))
+        self.btn_test.pack(side=TOP, padx=(30, 30), pady=(1000, 0))
+
+    def makeRightHomeFrame(self):
+        # testlabel
+        self.label_homepage = Label(self.right_frame, text="Homepage", fg="black", bg="white", font=("DejaVu Sans", 40, "bold"))
+
+        # packs
+        self.label_homepage.pack(side=TOP, padx=(30, 30), pady=(20, 0))
+
+    def makeRightTemperatuurFrame(self):
+        # Homebutton
         self.homebutton = PhotoImage(file="home.gif")
-        self.button_home = Button(self.right_frame, image=self.homebutton, bg="lightgrey", command=self.raiseTemperatuur)
+        self.button_home = Button(self.right_frame_temperatuur, image=self.homebutton, bg="white",anchor="e", command=self.raiseHome)
         self.button_home.homebutton = self.homebutton
 
+        # Label
+        self.label_temp = Label(self.right_frame_temperatuur, text="Instellingen Temperatuur", fg="black",anchor='w', bg="white", font=("DejaVu Sans", 20, "bold"))
 
-        # pack labels
-        self.label_instellingen.pack(side=TOP, padx=(30, 30), pady=(20, 0))
+        # Packs
+        self.label_temp.pack(side=TOP, padx=(30, 30), pady=(20, 0), fill='both')
         self.button_home.pack(side=BOTTOM, padx=(950, 30), pady=(20, 20))
+
+    def makeRolluikFrame(self):
+        self.label_rolluik = Label(self.right_frame_rolluik, text="Instellingen Rolluik", fg="black", anchor='w', bg="white", font=("DejaVu Sans", 20, "bold"))
+
+        # Homebutton
+        self.homebutton = PhotoImage(file="home.gif")
+        self.button_home = Button(self.right_frame_rolluik, image=self.homebutton, bg="white",anchor="e", command=self.raiseHome)
+        self.button_home.homebutton = self.homebutton
+
+        #packs
+        self.label_rolluik.pack(side=TOP, padx=(30, 30), pady=(20, 0), fill='both')
+        self.button_home.pack(side=BOTTOM, padx=(950, 30), pady=(20, 20))
+
+
+
+
+
+
 
 root = Tk()  # make instance of tkinter
 gui = Gui(root)
