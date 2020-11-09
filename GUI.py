@@ -1,6 +1,9 @@
 from tkinter import *
+from tkinter import ttk
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+
+
 # fg="#F2AA4C",bg="#101820",
 #old bg #E3F2FD
 
@@ -72,41 +75,50 @@ class Gui:
 
     def makeRightHomeFrame(self):
         # Matplotlib grafiek temperatuur
-        x = [1,2,3,4,5,6]
-        y = [21,20,21,22,23,22]
-        figure2 = plt.Figure(figsize=(5, 4), dpi=100)
-        ax2 = figure2.add_subplot(111)
-        ax2.plot(x,y)
-        ax2.set_ylabel("Temperatuur in C°")
-        ax2.set_xlabel("Verlopen tijd in seconden")
-        line2 = FigureCanvasTkAgg(figure2, self.right_frame)
+        self.x = ["10:00","11:00","12:00","13:00","14:00","15:00"]
+        self.y = [21,20,21,22,23,22]
+        self.figure2 = plt.Figure(figsize=(5, 4), dpi=100)
+        self.ax2 = self.figure2.add_subplot(111)
+        self.ax2.plot(self.x,self.y)
+        self.ax2.set_ylabel("Temperatuur in C°")
+        self.ax2.set_xlabel("Verlopen tijd in uren")
+        self.line2 = FigureCanvasTkAgg(self.figure2, self.right_frame)
 
         # Matplotlib grafiek licht
-        x1 = [400,500,600,700,800,900]
-        y1 = [0.5,0.6,0.8,0.9,1,1.1]
-        figure1 = plt.Figure(figsize=(5, 4), dpi=100)
-        ax1 = figure1.add_subplot(111)
-        ax1.plot(x1,y1)
-        ax1.set_ylabel("Lichtinval in lumen")
-        ax1.set_xlabel("Verlopen tijd in seconden")
-        line1 = FigureCanvasTkAgg(figure1, self.right_frame)
-
+        self.x1 = [400,500,600,700,800,900]
+        self.y1 = [0.5,0.6,0.8,0.9,1,1.1]
+        self.figure1 = plt.Figure(figsize=(5, 4), dpi=100)
+        self.ax1 = self.figure1.add_subplot(111)
+        self.ax1.plot(self.x1,self.y1)
+        self.ax1.set_ylabel("Lichtinval in lumen")
+        self.ax1.set_xlabel("Verlopen tijd in seconden")
+        self.line1 = FigureCanvasTkAgg(self.figure1, self.right_frame)
         # labels
-        self.label_homepage = Label(self.right_frame, text="Visualisatie van temperatuursensor", fg="black", bg="white", anchor='w', font=("DejaVu Sans", 20, "bold"))
+        self.label_homepage = Label(self.right_frame, text="Visualisatie van temperatuur en lichtsensor", fg="black", bg="white", anchor='w', font=("DejaVu Sans", 20, "bold"))
 
 
-        # Dropdown voor grafiek
-        self.grafiekvariable = StringVar(self.master)
-        self.grafiekvariable.set("Temperatuur")  # default value
+        # # Dropdown voor grafiek
+        self.comboGrafiek = ttk.Combobox(self.right_frame,values=["Temperatuur","Licht"], state="readonly")
+        self.comboGrafiek.current(0)
+        self.comboGrafiek.bind('<<ComboboxSelected>>',self.changeHomeGrafiekLicht)
 
-        self.grafiek = OptionMenu(self.right_frame, self.grafiekvariable,"Temperatuur","Licht")
-        self.grafiek["menu"].config(bg="white",relief="raised")
-        self.grafiek.config(bg="white",relief="raised")
 
         # packs
         self.label_homepage.pack(side=TOP, padx=(30, 30), pady=(20, 0),fill='both')
-        line2.get_tk_widget().pack(side=TOP, fill=BOTH,padx=(30, 30), pady=(20, 0))
-        self.grafiek.place(x=600, y=25)
+        self.line2.get_tk_widget().pack(side=TOP, fill=BOTH,padx=(30, 30), pady=(20, 0))
+        self.comboGrafiek.place(x=700, y=30)
+        # self.grafiek.place(x=600, y=25)
+
+    def changeHomeGrafiekLicht(self,another_parameter):
+        if self.comboGrafiek.get() == "Licht":
+            self.line2.get_tk_widget().pack_forget()
+            self.line1.get_tk_widget().pack(side=TOP, fill=BOTH, padx=(30, 30), pady=(20, 0))
+        if self.comboGrafiek.get() == "Temperatuur":
+            self.line1.get_tk_widget().pack_forget()
+            self.line2.get_tk_widget().pack(side=TOP, fill=BOTH, padx=(30, 30), pady=(20, 0))
+
+    def callbackFunc(event):
+        print("New Element Selected")
 
     def makeRightTemperatuurFrame(self):
         # Homebutton
