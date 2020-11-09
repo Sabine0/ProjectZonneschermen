@@ -96,20 +96,17 @@ class Gui:
         # labels
         self.label_homepage = Label(self.right_frame, text="Visualisatie van temperatuur en lichtsensor", fg="black", bg="white", anchor='w', font=("DejaVu Sans", 20, "bold"))
 
-
         # # Dropdown voor grafiek
-        self.comboGrafiek = ttk.Combobox(self.right_frame,values=["Temperatuur","Licht"], state="readonly")
+        self.comboGrafiek = ttk.Combobox(self.right_frame,values=["Temperatuur","Licht"], state="readonly",width=13)
         self.comboGrafiek.current(0)
-        self.comboGrafiek.bind('<<ComboboxSelected>>',self.changeHomeGrafiekLicht)
-
+        self.comboGrafiek.bind('<<ComboboxSelected>>',self.changeHomeGrafiek)
 
         # packs
         self.label_homepage.pack(side=TOP, padx=(30, 30), pady=(20, 0),fill='both')
         self.line2.get_tk_widget().pack(side=TOP, fill=BOTH,padx=(30, 30), pady=(20, 0))
         self.comboGrafiek.place(x=700, y=30)
-        # self.grafiek.place(x=600, y=25)
 
-    def changeHomeGrafiekLicht(self,another_parameter):
+    def changeHomeGrafiek(self,another_parameter):
         if self.comboGrafiek.get() == "Licht":
             self.line2.get_tk_widget().pack_forget()
             self.line1.get_tk_widget().pack(side=TOP, fill=BOTH, padx=(30, 30), pady=(20, 0))
@@ -135,48 +132,31 @@ class Gui:
         self.label_lichtbovengrens = Label(self.right_frame_temperatuur, text="Bovengrens:", fg="black", anchor='w',bg="white")
 
         # dropdown menu voor temperatuur
-        self.ondergrenstempvariable = StringVar(self.master)
-        self.ondergrenstempvariable.set(3)  # default value
+        self.ondergrenstemp = ttk.Combobox(self.right_frame_temperatuur, state="readonly",width=4,height=50, values=[3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,])
+        self.ondergrenstemp.current(0)
 
-        self.ondergrenstemp = OptionMenu(self.right_frame_temperatuur, self.ondergrenstempvariable,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,)
-        self.ondergrenstemp["menu"].config(bg="white",relief="raised")
-        self.ondergrenstemp.config(bg="white",relief="raised")
-
-        self.bovengrenstempvariable = StringVar(self.master)
-        self.bovengrenstempvariable.set(20)  # default value
-
-        self.bovengrenstemp = OptionMenu(self.right_frame_temperatuur, self.bovengrenstempvariable, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, )
-        self.bovengrenstemp["menu"].config(bg="white", relief="raised")
-        self.bovengrenstemp.config(bg="white", relief="raised")
+        self.bovengrenstemp = ttk.Combobox(self.right_frame_temperatuur, state="readonly",width=4,height=50, values=[3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,])
+        self.bovengrenstemp.current(17)
 
         # dropdown menu voor licht
-        self.ondergrenslichtvariable = StringVar(self.master)
-        self.ondergrenslichtvariable.set(3)  # default value
+        self.ondergrenslicht = ttk.Combobox(self.right_frame_temperatuur, state="readonly",width=4,height=50, values=[3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,])
+        self.ondergrenslicht.current(0)
 
-        self.ondergrenslicht = OptionMenu(self.right_frame_temperatuur, self.ondergrenslichtvariable,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,)
-        self.ondergrenslicht["menu"].config(bg="white",relief="raised")
-        self.ondergrenslicht.config(bg="white",relief="raised")
-
-        self.bovengrenslichtvariable = StringVar(self.master)
-        self.bovengrenslichtvariable.set(20)  # default value
-
-        self.bovengrenslicht = OptionMenu(self.right_frame_temperatuur, self.bovengrenslichtvariable, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, )
-        self.bovengrenslicht["menu"].config(bg="white", relief="raised")
-        self.bovengrenslicht.config(bg="white", relief="raised")
-
+        self.bovengrenslicht = ttk.Combobox(self.right_frame_temperatuur, state="readonly", width=4,height=50, values=[3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,])
+        self.bovengrenslicht.current(17)
 
         # Packs
         self.label_temp.pack(side=TOP, padx=(30, 30), pady=(20, 0), fill='both')
         self.button_home.pack(side=BOTTOM, padx=(950, 30), pady=(20, 20))
         self.label_tempondergrens.pack(side=TOP, padx=(30, 30), pady=(20, 20),fill='both')
-        self.ondergrenstemp.place(x=150, y=75)
-        self.bovengrenstemp.place(x=150, y=135)
+        self.ondergrenstemp.place(x=150, y=80)
+        self.bovengrenstemp.place(x=150, y=140)
         self.label_tempbovengrens.pack(side=TOP, padx=(30, 30), pady=(20, 20), fill='both')
         self.label_licht.pack(side=TOP, padx=(30, 30), pady=(20, 0), fill='both')
         self.label_lichtondergrens.pack(side=TOP, padx=(30, 30), pady=(20, 20), fill='both')
         self.label_lichtbovengrens.pack(side=TOP, padx=(30, 30), pady=(20, 20), fill='both')
-        self.ondergrenslicht.place(x=150, y=255)
-        self.bovengrenslicht.place(x=150, y=315)
+        self.ondergrenslicht.place(x=150, y=260)
+        self.bovengrenslicht.place(x=150, y=320)
 
     def makeRolluikFrame(self):
         # labels
@@ -192,27 +172,19 @@ class Gui:
         self.button_home.homebutton = self.homebutton
 
         # dropdown menu voor rolluik
-        self.ondergrensrolluikvariable = StringVar(self.master)
-        self.ondergrensrolluikvariable.set(0.05)  # default value
+        self.ondergrensrolluik = ttk.Combobox(self.right_frame_rolluik,state="readonly",width=10,height=50, values=[0.05,0.1,0.15,0.2,0.25,0.3,0.35,0.4,0.45,0.5,0.55,0.6,0.65,0.7,0.75,0.8,0.85,0.9,0.95,1.0,1.05,1.1,1.15,1.2,1.25,1.3,1.35,1.4,1.45,1.5,1.55,1.60])
+        self.ondergrensrolluik.current(0)
 
-        self.ondergrensrolluik = OptionMenu(self.right_frame_rolluik, self.ondergrensrolluikvariable,0.05,0.10)
-        self.ondergrensrolluik["menu"].config(bg="white",relief="raised")
-        self.ondergrensrolluik.config(bg="white",relief="raised")
-
-        self.bovengrensrolluikvariable = StringVar(self.master)
-        self.bovengrensrolluikvariable.set(1.65)  # default value
-
-        self.bovengrensrolluik = OptionMenu(self.right_frame_rolluik, self.bovengrensrolluikvariable, 1.65,1.60)
-        self.bovengrensrolluik["menu"].config(bg="white", relief="raised")
-        self.bovengrensrolluik.config(bg="white", relief="raised")
+        self.bovengrensrolluik = ttk.Combobox(self.right_frame_rolluik,state="readonly",width=10,height=50, values=[0.1,0.15,0.2,0.25,0.3,0.35,0.4,0.45,0.5,0.55,0.6,0.65,0.7,0.75,0.8,0.85,0.9,0.95,1.0,1.05,1.1,1.15,1.2,1.25,1.3,1.35,1.4,1.45,1.5,1.55,1.60])
+        self.bovengrensrolluik.current(30)
 
         # packs
         self.label_rolluik.pack(side=TOP, padx=(30, 30), pady=(20, 0), fill='both')
         self.button_home.pack(side=BOTTOM, padx=(950, 30), pady=(20, 20))
         self.label_rolluikondergrens.pack(side=TOP, padx=(30, 30), pady=(20, 20), fill='both')
         self.label_rolluikbovengrens.pack(side=TOP, padx=(30, 30), pady=(20, 20), fill='both')
-        self.ondergrensrolluik.place(x=150, y=75)
-        self.bovengrensrolluik.place(x=150, y=135)
+        self.ondergrensrolluik.place(x=150, y=80)
+        self.bovengrensrolluik.place(x=150, y=140)
 
 
 
