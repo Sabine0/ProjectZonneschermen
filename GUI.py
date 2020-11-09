@@ -1,6 +1,5 @@
 from tkinter import *
 
-
 # fg="#F2AA4C",bg="#101820",
 #old bg #E3F2FD
 
@@ -27,11 +26,10 @@ class Gui:
         self.right_frame_temperatuur.grid(row=0, column=1, sticky="nsew")
 
         # left side frames
+        self.left_frame_buttons = Frame(self.mainframe, bg="#101820", width=100)
+        self.left_frame_buttons.grid(row=0, column=0, sticky="ns")
         self.left_frame = Frame(self.mainframe, bg="#101820", width=100)
         self.left_frame.grid(row=0, column=0, sticky="ns")
-
-
-
 
         # make frames
         self.makeRolluikFrame()
@@ -43,6 +41,9 @@ class Gui:
     def raiseTemperatuur(self):
         self.right_frame_temperatuur.tkraise()
 
+    def raiseButtons(self):
+        self.left_frame_buttons.tkraise()
+
     def raiseHome(self):
         self.right_frame.tkraise()
 
@@ -53,17 +54,23 @@ class Gui:
         # Buttons
         self.btn_temp = Button(self.left_frame, text="Temperatuur / Licht", fg="#101820", width=25, height=5, command=self.raiseTemperatuur)
         self.btn_rolluik = Button(self.left_frame, text="Rolluik", fg="black", width=25, height=5,command=self.raiseRolluikFrame)
-        self.btn_test = Button(self.left_frame, text=".", fg="black", width=1, height=1)
+        self.btn_uitrollen = Button(self.left_frame, text="Uitrollen", fg="black", width=10, height=2)
+        self.btn_inrollen = Button(self.left_frame, text="Inrollen", fg="black", width=10, height=2)
 
         # labels
-        self.label_instellingen = Label(self.left_frame, text="Instellingen", fg="#F2AA4C", bg="#101820", relief=FLAT,font=("DejaVu Sans", 20, "bold"))
-        self.label_instellingen = Label(self.left_frame, text="Instellingen", fg="#F2AA4C", bg="#101820", relief=FLAT,font=("DejaVu Sans", 20, "bold"))
+        self.label_instellingen = Label(self.left_frame, text="Instellingen", fg="#F2AA4C", bg="#101820",font=("DejaVu Sans", 20, "bold"))
+        self.label_handmatig = Label(self.left_frame, text="Handmatig", fg="#F2AA4C", bg="#101820",font=("DejaVu Sans", 20, "bold"))
 
         # packs
         self.label_instellingen.pack(side=TOP, padx=(30, 30), pady=(20, 0))
         self.btn_temp.pack(side=TOP, padx=(30, 30), pady=(10, 0))
         self.btn_rolluik.pack(side=TOP, padx=(30, 30), pady=(20, 0))
-        self.btn_test.pack(side=TOP, padx=(30, 30), pady=(1000, 0))
+        self.label_handmatig.pack(side=TOP, padx=(30, 30), pady=(100, 100))
+        self.btn_uitrollen.place(x=30,y=420)
+        self.btn_inrollen.place(x=140, y=420)
+        # self.btn_uitrollen.pack(padx=(30, 30), pady=(10, 0))
+        # self.btn_inrollen.pack(padx=(30, 30), pady=(10, 0))
+
 
     def makeRightHomeFrame(self):
         # testlabel
@@ -75,28 +82,99 @@ class Gui:
     def makeRightTemperatuurFrame(self):
         # Homebutton
         self.homebutton = PhotoImage(file="home.gif")
-        self.button_home = Button(self.right_frame_temperatuur, image=self.homebutton, bg="white",anchor="e", command=self.raiseHome)
+        self.button_home = Button(self.right_frame_temperatuur, image=self.homebutton,relief="flat", bg="white",anchor="e", command=self.raiseHome)
         self.button_home.homebutton = self.homebutton
 
         # Label
         self.label_temp = Label(self.right_frame_temperatuur, text="Instellingen Temperatuur", fg="black",anchor='w', bg="white", font=("DejaVu Sans", 20, "bold"))
+        self.label_licht = Label(self.right_frame_temperatuur, text="Instellingen Licht", fg="black", anchor='w',bg="white", font=("DejaVu Sans", 20, "bold"))
+        self.label_tempondergrens = Label(self.right_frame_temperatuur, text="Ondergrens (C°):", fg="black", anchor='w', bg="white")
+        self.label_tempbovengrens = Label(self.right_frame_temperatuur, text="Bovengrens (C°):", fg="black", anchor='w', bg="white")
+        self.label_lichtondergrens = Label(self.right_frame_temperatuur, text="Ondergrens:", fg="black", anchor='w',bg="white")
+        self.label_lichtbovengrens = Label(self.right_frame_temperatuur, text="Bovengrens:", fg="black", anchor='w',bg="white")
+
+        # dropdown menu voor temperatuur
+        self.ondergrenstempvariable = StringVar(self.master)
+        self.ondergrenstempvariable.set(3)  # default value
+
+        self.ondergrenstemp = OptionMenu(self.right_frame_temperatuur, self.ondergrenstempvariable,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,)
+        self.ondergrenstemp["menu"].config(bg="white",relief="raised")
+        self.ondergrenstemp.config(bg="white",relief="raised")
+
+        self.bovengrenstempvariable = StringVar(self.master)
+        self.bovengrenstempvariable.set(20)  # default value
+
+        self.bovengrenstemp = OptionMenu(self.right_frame_temperatuur, self.bovengrenstempvariable, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, )
+        self.bovengrenstemp["menu"].config(bg="white", relief="raised")
+        self.bovengrenstemp.config(bg="white", relief="raised")
+
+        # dropdown menu voor licht
+        self.ondergrenslichtvariable = StringVar(self.master)
+        self.ondergrenslichtvariable.set(3)  # default value
+
+        self.ondergrenslicht = OptionMenu(self.right_frame_temperatuur, self.ondergrenslichtvariable,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,)
+        self.ondergrenslicht["menu"].config(bg="white",relief="raised")
+        self.ondergrenslicht.config(bg="white",relief="raised")
+
+        self.bovengrenslichtvariable = StringVar(self.master)
+        self.bovengrenslichtvariable.set(20)  # default value
+
+        self.bovengrenslicht = OptionMenu(self.right_frame_temperatuur, self.bovengrenslichtvariable, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, )
+        self.bovengrenslicht["menu"].config(bg="white", relief="raised")
+        self.bovengrenslicht.config(bg="white", relief="raised")
+
 
         # Packs
         self.label_temp.pack(side=TOP, padx=(30, 30), pady=(20, 0), fill='both')
         self.button_home.pack(side=BOTTOM, padx=(950, 30), pady=(20, 20))
+        self.label_tempondergrens.pack(side=TOP, padx=(30, 30), pady=(20, 20),fill='both')
+        self.ondergrenstemp.place(x=150, y=75)
+        self.bovengrenstemp.place(x=150, y=135)
+        self.label_tempbovengrens.pack(side=TOP, padx=(30, 30), pady=(20, 20), fill='both')
+        self.label_licht.pack(side=TOP, padx=(30, 30), pady=(20, 0), fill='both')
+        self.label_lichtondergrens.pack(side=TOP, padx=(30, 30), pady=(20, 20), fill='both')
+        self.label_lichtbovengrens.pack(side=TOP, padx=(30, 30), pady=(20, 20), fill='both')
+        self.ondergrenslicht.place(x=150, y=255)
+        self.bovengrenslicht.place(x=150, y=315)
+
 
     def makeRolluikFrame(self):
-        self.label_rolluik = Label(self.right_frame_rolluik, text="Instellingen Rolluik", fg="black", anchor='w', bg="white", font=("DejaVu Sans", 20, "bold"))
-
+        # labels
+        self.label_rolluik = Label(self.right_frame_rolluik, text="Instellingen Rolluik", fg="black", anchor='w',
+                                   bg="white", font=("DejaVu Sans", 20, "bold"))
+        self.label_rolluikondergrens = Label(self.right_frame_rolluik, text="Minimale uitrol (m):", fg="black",
+                                             anchor='w', bg="white")
+        self.label_rolluikbovengrens = Label(self.right_frame_rolluik, text="Maximale uitrol (m):", fg="black",
+                                             anchor='w', bg="white")
         # Homebutton
         self.homebutton = PhotoImage(file="home.gif")
-        self.button_home = Button(self.right_frame_rolluik, image=self.homebutton, bg="white",anchor="e", command=self.raiseHome)
+        self.button_home = Button(self.right_frame_rolluik, image=self.homebutton,relief="flat", bg="white",anchor="e", command=self.raiseHome)
         self.button_home.homebutton = self.homebutton
 
-        #packs
+        # dropdown menu voor rolluik
+        self.ondergrensrolluikvariable = StringVar(self.master)
+        self.ondergrensrolluikvariable.set(0.05)  # default value
+
+        self.ondergrensrolluik = OptionMenu(self.right_frame_rolluik, self.ondergrensrolluikvariable,0.05,0.10)
+        self.ondergrensrolluik["menu"].config(bg="white",relief="raised")
+        self.ondergrensrolluik.config(bg="white",relief="raised")
+
+        self.bovengrensrolluikvariable = StringVar(self.master)
+        self.bovengrensrolluikvariable.set(1.65)  # default value
+
+        self.bovengrensrolluik = OptionMenu(self.right_frame_rolluik, self.bovengrensrolluikvariable, 1.65,1.60)
+        self.bovengrensrolluik["menu"].config(bg="white", relief="raised")
+        self.bovengrensrolluik.config(bg="white", relief="raised")
+
+
+
+        # packs
         self.label_rolluik.pack(side=TOP, padx=(30, 30), pady=(20, 0), fill='both')
         self.button_home.pack(side=BOTTOM, padx=(950, 30), pady=(20, 20))
-
+        self.label_rolluikondergrens.pack(side=TOP, padx=(30, 30), pady=(20, 20), fill='both')
+        self.label_rolluikbovengrens.pack(side=TOP, padx=(30, 30), pady=(20, 20), fill='both')
+        self.ondergrensrolluik.place(x=150, y=75)
+        self.bovengrensrolluik.place(x=150, y=135)
 
 
 
