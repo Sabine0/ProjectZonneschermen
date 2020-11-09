@@ -1,5 +1,6 @@
 from tkinter import *
-
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 # fg="#F2AA4C",bg="#101820",
 #old bg #E3F2FD
 
@@ -68,16 +69,44 @@ class Gui:
         self.label_handmatig.pack(side=TOP, padx=(30, 30), pady=(100, 100))
         self.btn_uitrollen.place(x=30,y=420)
         self.btn_inrollen.place(x=140, y=420)
-        # self.btn_uitrollen.pack(padx=(30, 30), pady=(10, 0))
-        # self.btn_inrollen.pack(padx=(30, 30), pady=(10, 0))
-
 
     def makeRightHomeFrame(self):
-        # testlabel
-        self.label_homepage = Label(self.right_frame, text="Homepage", fg="black", bg="white", font=("DejaVu Sans", 40, "bold"))
+        # Matplotlib grafiek temperatuur
+        x = [1,2,3,4,5,6]
+        y = [100,101,75,90,104,105]
+        figure2 = plt.Figure(figsize=(5, 4), dpi=100)
+        ax2 = figure2.add_subplot(111)
+        ax2.plot(x,y)
+        ax2.set_ylabel("Temperatuur in C°")
+        ax2.set_xlabel("Verlopen tijd in seconden")
+        line2 = FigureCanvasTkAgg(figure2, self.right_frame)
+
+        # Matplotlib grafiek licht
+        x1 = [400,500,600,700,800,900]
+        y1 = [0.5,0.6,0.8,0.9,1,1.1]
+        figure1 = plt.Figure(figsize=(5, 4), dpi=100)
+        ax1 = figure1.add_subplot(111)
+        ax1.plot(x1,y1)
+        ax1.set_ylabel("Lichtinval in lumen")
+        ax1.set_xlabel("Verlopen tijd in seconden")
+        line1 = FigureCanvasTkAgg(figure1, self.right_frame)
+
+        # labels
+        self.label_homepage = Label(self.right_frame, text="Visualisatie van temperatuursensor", fg="black", bg="white", anchor='w', font=("DejaVu Sans", 20, "bold"))
+
+
+        # Dropdown voor grafiek
+        self.grafiekvariable = StringVar(self.master)
+        self.grafiekvariable.set("Temperatuur")  # default value
+
+        self.grafiek = OptionMenu(self.right_frame, self.grafiekvariable,"Temperatuur","Licht")
+        self.grafiek["menu"].config(bg="white",relief="raised")
+        self.grafiek.config(bg="white",relief="raised")
 
         # packs
-        self.label_homepage.pack(side=TOP, padx=(30, 30), pady=(20, 0))
+        self.label_homepage.pack(side=TOP, padx=(30, 30), pady=(20, 0),fill='both')
+        line2.get_tk_widget().pack(side=TOP, fill=BOTH,padx=(30, 30), pady=(20, 0))
+        self.grafiek.place(x=600, y=25)
 
     def makeRightTemperatuurFrame(self):
         # Homebutton
@@ -137,7 +166,6 @@ class Gui:
         self.ondergrenslicht.place(x=150, y=255)
         self.bovengrenslicht.place(x=150, y=315)
 
-
     def makeRolluikFrame(self):
         # labels
         self.label_rolluik = Label(self.right_frame_rolluik, text="Instellingen Rolluik", fg="black", anchor='w',
@@ -165,8 +193,6 @@ class Gui:
         self.bovengrensrolluik = OptionMenu(self.right_frame_rolluik, self.bovengrensrolluikvariable, 1.65,1.60)
         self.bovengrensrolluik["menu"].config(bg="white", relief="raised")
         self.bovengrensrolluik.config(bg="white", relief="raised")
-
-
 
         # packs
         self.label_rolluik.pack(side=TOP, padx=(30, 30), pady=(20, 0), fill='both')
