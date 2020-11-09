@@ -73,7 +73,7 @@ class Gui:
     def makeRightHomeFrame(self):
         # Matplotlib grafiek temperatuur
         x = [1,2,3,4,5,6]
-        y = [100,101,75,90,104,105]
+        y = [21,20,21,22,23,22]
         figure2 = plt.Figure(figsize=(5, 4), dpi=100)
         ax2 = figure2.add_subplot(111)
         ax2.plot(x,y)
