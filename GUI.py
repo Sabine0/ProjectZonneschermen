@@ -3,10 +3,6 @@ from tkinter import ttk
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
-
-# fg="#F2AA4C",bg="#101820",
-# old bg #E3F2FD
-
 class Gui:
     def __init__(self, master):
         self.master = master  # The master attribute gives access to the root window (Tk)
@@ -93,10 +89,11 @@ class Gui:
         self.ax1.set_ylabel("Lichtinval in lumen")
         self.ax1.set_xlabel("Verlopen tijd in seconden")
         self.line1 = FigureCanvasTkAgg(self.figure1, self.right_frame)
+
         # labels
         self.label_homepage = Label(self.right_frame, text="Visualisatie van temperatuur en lichtsensor", fg="black", bg="white", anchor='w', font=("DejaVu Sans", 20, "bold"))
 
-        # # Dropdown voor grafiek
+        # Dropdown voor grafiek
         self.comboGrafiek = ttk.Combobox(self.right_frame, values=["Temperatuur", "Licht"], state="readonly", width=13)
         self.comboGrafiek.current(0)
         self.comboGrafiek.bind('<<ComboboxSelected>>', self.changeHomeGrafiek)
@@ -113,9 +110,6 @@ class Gui:
         if self.comboGrafiek.get() == "Temperatuur":
             self.line1.get_tk_widget().pack_forget()
             self.line2.get_tk_widget().pack(side=TOP, fill=BOTH, padx=(30, 30), pady=(20, 0))
-
-    def callbackFunc(event):
-        print("New Element Selected")
 
     def makeRightTemperatuurFrame(self):
         # Homebutton
