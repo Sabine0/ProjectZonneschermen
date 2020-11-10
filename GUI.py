@@ -2,6 +2,9 @@ from tkinter import *
 from tkinter import ttk
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+import matplotlib.animation as animation
+import serial
+import os
 
 class Gui:
     def __init__(self, master):
@@ -24,6 +27,39 @@ class Gui:
         self.right_frame.grid(row=0, column=1, sticky="nsew")
         self.right_frame_rolluik.grid(row=0, column=1, sticky="nsew")
         self.right_frame_temperatuur.grid(row=0, column=1, sticky="nsew")
+
+        # compoorten
+        # Functies voor het maken van het juiste window
+    # def buildCOM3(self):
+    #         self.build_window('COM3')
+    #
+    # def buildCOM4(self):
+    #         self.build_window('COM4')
+    #
+    # def buildCOM5(self):
+    #         self.build_window('COM5')
+    #
+    # def buildCOM6(self):
+    #         self.build_window('COM6')
+    #
+    # def buildCOM7(self):
+    #         self.build_window('COM7')
+    #
+    # def buildCOM2(self):
+    #         self.build_window('COM2')
+    #
+    # # Haal het type module op
+    # def get_type(self, read):
+    #     if read == b'\xf0':
+    #         self.name = 'Temperatuur'
+    #     elif read == b'\xe0':
+    #         self.name = 'Lichtintensiteit'
+    #     elif read == b'\xd0':
+    #         self.name = 'Licht- en temperatuursensor'
+    #     elif read == b'\xc0':
+    #         self.name = 'Demonstratie eenheid'
+    #     elif read == b'\xb0':
+    #         self.name = 'Demonstratie eenheid ultrasoon'
 
         # left side frames
         self.left_frame_buttons = Frame(self.mainframe, bg="#101820", width=100)
@@ -50,6 +86,26 @@ class Gui:
     def raiseRolluikFrame(self):
         self.right_frame_rolluik.tkraise()
 
+    def updateGraph(self):
+        self.line2.get_tk_widget().destroy()
+        self.x = []
+        self.y = []
+        graph_data = open('example.csv', 'r').read()
+        lines = graph_data.split('\n')
+        for line in lines:
+            if len(line) > 1:
+                x, y = line.split(',')
+                self.x.append(int(x))
+                self.y.append(int(y))
+
+        self.figure2 = plt.Figure(figsize=(5, 4), dpi=100)
+        self.ax2 = self.figure2.add_subplot(111)
+        self.ax2.plot(self.x, self.y)
+        self.ax2.set_ylabel("Temperatuur in C°")
+        self.ax2.set_xlabel("Meetmomenten")
+        self.line2 = FigureCanvasTkAgg(self.figure2, self.right_frame)
+        self.line2.get_tk_widget().pack(side=TOP, fill=BOTH, padx=(30, 30), pady=(20, 0))
+
     def makeLeftFrame(self):
         # Buttons
         self.btn_temp = Button(self.left_frame, text="Temperatuur / Licht", fg="#101820", width=25, height=5, command=self.raiseTemperatuur)
@@ -70,16 +126,32 @@ class Gui:
         self.btn_inrollen.place(x=140, y=420)
 
     def makeRightHomeFrame(self):
+        self.x = []
+        self.y = []
+        graph_data = open('example.csv', 'r').read()
+        lines = graph_data.split('\n')
+        for line in lines:
+            if len(line) > 1:
+                x,y = line.split(',')
+                self.x.append(int(x))
+                self.y.append(int(y))
+
         # Matplotlib grafiek temperatuur
-        self.x = ["10:00", "11:00", "12:00", "13:00", "14:00", "15:00"]
-        self.y = [21, 20, 21, 19, 23, 22]
+        # self.x = ["10:00", "11:00", "12:00", "13:00", "14:00", "15:00"]
+        # self.y = [21, 20, 21, 19, 23, 22]
         self.figure2 = plt.Figure(figsize=(5, 4), dpi=100)
         self.ax2 = self.figure2.add_subplot(111)
         self.ax2.plot(self.x, self.y)
         self.ax2.set_ylabel("Temperatuur in C°")
-        self.ax2.set_xlabel("Verlopen tijd in uren")
+        self.ax2.set_xlabel("Meetmomenten")
         self.line2 = FigureCanvasTkAgg(self.figure2, self.right_frame)
 
+        self.test = Button(self.right_frame,text="test", fg="#101820", width=25, height=5,command=self.updateGraph)
+        self.btn_temp = Button(self.left_frame, text="Temperatuur / Licht", fg="#101820", width=25, height=5,
+                               command=self.raiseTemperatuur)
+
+        self.test.pack(side=BOTTOM)
+        
         # Matplotlib grafiek licht
         self.x1 = [400, 500, 600, 700, 800, 900]
         self.y1 = [0.5, 0.6, 0.8, 0.9, 1, 1.1]
@@ -97,6 +169,7 @@ class Gui:
         self.comboGrafiek = ttk.Combobox(self.right_frame, values=["Temperatuur", "Licht"], state="readonly", width=13)
         self.comboGrafiek.current(0)
         self.comboGrafiek.bind('<<ComboboxSelected>>', self.changeHomeGrafiek)
+
 
         # packs
         self.label_homepage.pack(side=TOP, padx=(30, 30), pady=(20, 0), fill='both')
