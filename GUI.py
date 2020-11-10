@@ -87,24 +87,25 @@ class Gui:
         self.right_frame_rolluik.tkraise()
 
     def updateGraph(self):
-        self.line2.get_tk_widget().destroy()
-        self.x = []
-        self.y = []
-        graph_data = open('example.csv', 'r').read()
-        lines = graph_data.split('\n')
-        for line in lines:
-            if len(line) > 1:
-                x, y = line.split(',')
-                self.x.append(int(x))
-                self.y.append(int(y))
+        if self.comboGrafiek.get() == "Temperatuur":
+            self.line2.get_tk_widget().destroy()
+            self.x = []
+            self.y = []
+            graph_data = open('example.csv', 'r').read()
+            lines = graph_data.split('\n')
+            for line in lines:
+                if len(line) > 1:
+                    x, y = line.split(',')
+                    self.x.append(int(x))
+                    self.y.append(int(y))
 
-        self.figure2 = plt.Figure(figsize=(5, 4), dpi=100)
-        self.ax2 = self.figure2.add_subplot(111)
-        self.ax2.plot(self.x, self.y)
-        self.ax2.set_ylabel("Temperatuur in C°")
-        self.ax2.set_xlabel("Meetmomenten")
-        self.line2 = FigureCanvasTkAgg(self.figure2, self.right_frame)
-        self.line2.get_tk_widget().pack(side=TOP, fill=BOTH, padx=(30, 30), pady=(20, 0))
+            self.figure2 = plt.Figure(figsize=(5, 4), dpi=100)
+            self.ax2 = self.figure2.add_subplot(111)
+            self.ax2.plot(self.x, self.y)
+            self.ax2.set_ylabel("Temperatuur in C°")
+            self.ax2.set_xlabel("Meetmomenten")
+            self.line2 = FigureCanvasTkAgg(self.figure2, self.right_frame)
+            self.line2.get_tk_widget().pack(side=TOP, fill=BOTH, padx=(30, 30), pady=(20, 0))
 
     def makeLeftFrame(self):
         # Buttons
@@ -151,7 +152,7 @@ class Gui:
                                command=self.raiseTemperatuur)
 
         self.test.pack(side=BOTTOM)
-        
+
         # Matplotlib grafiek licht
         self.x1 = [400, 500, 600, 700, 800, 900]
         self.y1 = [0.5, 0.6, 0.8, 0.9, 1, 1.1]
