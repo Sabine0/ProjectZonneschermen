@@ -107,6 +107,26 @@ class Gui:
             self.line2 = FigureCanvasTkAgg(self.figure2, self.right_frame)
             self.line2.get_tk_widget().pack(side=TOP, fill=BOTH, padx=(30, 30), pady=(20, 0))
 
+        if self.comboGrafiek.get() == "Licht":
+            self.line1.get_tk_widget().destroy()
+            self.x1 = []
+            self.y1 = []
+            graph_data = open('example1.csv', 'r').read()
+            lines = graph_data.split('\n')
+            for line in lines:
+                if len(line) > 1:
+                    x1, y1 = line.split(',')
+                    self.x1.append(int(x1))
+                    self.y1.append(int(y1))
+            self.figure1 = plt.Figure(figsize=(5, 4), dpi=100)
+            self.ax1 = self.figure1.add_subplot(111)
+            self.ax1.plot(self.x1, self.y1)
+            self.ax1.set_ylabel("Lichtinval in lumen")
+            self.ax1.set_xlabel("Verlopen tijd in seconden")
+            self.line1 = FigureCanvasTkAgg(self.figure1, self.right_frame)
+            self.line1.get_tk_widget().pack(side=TOP, fill=BOTH, padx=(30, 30), pady=(20, 0))
+
+
     def makeLeftFrame(self):
         # Buttons
         self.btn_temp = Button(self.left_frame, text="Temperatuur / Licht", fg="#101820", width=25, height=5, command=self.raiseTemperatuur)
@@ -147,15 +167,24 @@ class Gui:
         self.ax2.set_xlabel("Meetmomenten")
         self.line2 = FigureCanvasTkAgg(self.figure2, self.right_frame)
 
-        self.test = Button(self.right_frame,text="test", fg="#101820", width=25, height=5,command=self.updateGraph)
+        self.refresh = Button(self.right_frame,text="Refresh", fg="#101820", width=25, height=5,command=self.updateGraph)
         self.btn_temp = Button(self.left_frame, text="Temperatuur / Licht", fg="#101820", width=25, height=5,
                                command=self.raiseTemperatuur)
 
-        self.test.pack(side=BOTTOM)
+        self.refresh.pack(side=BOTTOM)
 
         # Matplotlib grafiek licht
-        self.x1 = [400, 500, 600, 700, 800, 900]
-        self.y1 = [0.5, 0.6, 0.8, 0.9, 1, 1.1]
+        # self.x1 = [400, 500, 600, 700, 800, 900]
+        # self.y1 = [0.5, 0.6, 0.8, 0.9, 1, 1.1]
+        self.x1 = []
+        self.y1 = []
+        graph_data = open('example1.csv', 'r').read()
+        lines = graph_data.split('\n')
+        for line in lines:
+            if len(line) > 1:
+                x1,y1 = line.split(',')
+                self.x1.append(int(x1))
+                self.y1.append(int(y1))
         self.figure1 = plt.Figure(figsize=(5, 4), dpi=100)
         self.ax1 = self.figure1.add_subplot(111)
         self.ax1.plot(self.x1, self.y1)
