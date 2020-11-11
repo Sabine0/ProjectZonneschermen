@@ -7,17 +7,10 @@ import serial
 import os
 
 class Gui:
-    grens_temp = 0
-    grens_licht = 0
-    min_uitrol = 0.5
-    max_uitrol = 1.65
-    op_of_uitrollen = 0
-
     def __init__(self, master):
         self.master = master  # The master attribute gives access to the root window (Tk)
         master.title("Dashboard")
         master.geometry("1280x720")
-
 
         # make mainframe
         self.mainframe = Frame(root, bg="red")
@@ -37,13 +30,36 @@ class Gui:
 
         # compoorten
         # Functies voor het maken van het juiste window
+    # def buildCOM3(self):
+    #         self.build_window('COM3')
+    #
+    # def buildCOM4(self):
+    #         self.build_window('COM4')
+    #
+    # def buildCOM5(self):
+    #         self.build_window('COM5')
+    #
+    # def buildCOM6(self):
+    #         self.build_window('COM6')
+    #
+    # def buildCOM7(self):
+    #         self.build_window('COM7')
+    #
+    # def buildCOM2(self):
+    #         self.build_window('COM2')
+    #
     # # Haal het type module op
     # def get_type(self, read):
     #     if read == b'\xf0':
     #         self.name = 'Temperatuur'
     #     elif read == b'\xe0':
     #         self.name = 'Lichtintensiteit'
-
+    #     elif read == b'\xd0':
+    #         self.name = 'Licht- en temperatuursensor'
+    #     elif read == b'\xc0':
+    #         self.name = 'Demonstratie eenheid'
+    #     elif read == b'\xb0':
+    #         self.name = 'Demonstratie eenheid ultrasoon'
 
         # left side frames
         self.left_frame_buttons = Frame(self.mainframe, bg="#101820", width=100)
@@ -57,7 +73,6 @@ class Gui:
         self.makeRightHomeFrame()
         self.makeRightTemperatuurFrame()
         self.raiseHome()
-        root.mainloop()  # infinite loop to keep gui running
 
     def raiseTemperatuur(self):
         self.right_frame_temperatuur.tkraise()
@@ -116,8 +131,9 @@ class Gui:
         # Buttons
         self.btn_temp = Button(self.left_frame, text="Temperatuur / Licht", fg="#101820", width=25, height=5, command=self.raiseTemperatuur)
         self.btn_rolluik = Button(self.left_frame, text="Rolluik", fg="black", width=25, height=5, command=self.raiseRolluikFrame)
-        self.btn_uitrollen = Button(self.left_frame, text="Uitrollen", fg="black", width=10, height=2, command=self.uitrollen)
-        self.btn_oprollen = Button(self.left_frame, text="Oprollen", fg="black", width=10, height=2, command=self.oprollen())
+        self.btn_uitrollen = Button(self.left_frame, text="Uitrollen", fg="black", width=10, height=2)
+        self.btn_inrollen = Button(self.left_frame, text="Inrollen", fg="black", width=10, height=2)
+
         # labels
         self.label_instellingen = Label(self.left_frame, text="Instellingen", fg="#F2AA4C", bg="#101820", font=("DejaVu Sans", 20, "bold"))
         self.label_handmatig = Label(self.left_frame, text="Handmatig", fg="#F2AA4C", bg="#101820", font=("DejaVu Sans", 20, "bold"))
@@ -128,15 +144,7 @@ class Gui:
         self.btn_rolluik.pack(side=TOP, padx=(30, 30), pady=(20, 0))
         self.label_handmatig.pack(side=TOP, padx=(30, 30), pady=(100, 100))
         self.btn_uitrollen.place(x=30, y=420)
-        self.btn_oprollen.place(x=140, y=420)
-
-    # def uitrollen(self):
-    #     arduinoData = serial.Serial('com3', 19200)
-    #     arduinoData.write(b'\x40')
-    #
-    # def oprollen(self):
-    #     arduinoData = serial.Serial('com3', 19200)
-    #     arduinoData.write(b'\x50')
+        self.btn_inrollen.place(x=140, y=420)
 
     def makeRightHomeFrame(self):
         self.x = []
@@ -149,6 +157,9 @@ class Gui:
                 self.x.append(int(x))
                 self.y.append(int(y))
 
+        # Matplotlib grafiek temperatuur
+        # self.x = ["10:00", "11:00", "12:00", "13:00", "14:00", "15:00"]
+        # self.y = [21, 20, 21, 19, 23, 22]
         self.figure2 = plt.Figure(figsize=(5, 4), dpi=100)
         self.ax2 = self.figure2.add_subplot(111)
         self.ax2.plot(self.x, self.y)
@@ -162,6 +173,9 @@ class Gui:
 
         self.refresh.pack(side=BOTTOM)
 
+        # Matplotlib grafiek licht
+        # self.x1 = [400, 500, 600, 700, 800, 900]
+        # self.y1 = [0.5, 0.6, 0.8, 0.9, 1, 1.1]
         self.x1 = []
         self.y1 = []
         graph_data = open('example1.csv', 'r').read()
@@ -207,31 +221,43 @@ class Gui:
         self.button_home.homebutton = self.homebutton
 
         # Label
-        self.label_temp = Label(self.right_frame_temperatuur, text="Instelling Temperatuur", fg="black", anchor='w', bg="white", font=("DejaVu Sans", 20, "bold"))
-        self.label_licht = Label(self.right_frame_temperatuur, text="Instelling Licht", fg="black", anchor='w', bg="white", font=("DejaVu Sans", 20, "bold"))
+        self.label_temp = Label(self.right_frame_temperatuur, text="Instellingen Temperatuur", fg="black", anchor='w', bg="white", font=("DejaVu Sans", 20, "bold"))
+        self.label_licht = Label(self.right_frame_temperatuur, text="Instellingen Licht", fg="black", anchor='w', bg="white", font=("DejaVu Sans", 20, "bold"))
         self.label_tempondergrens = Label(self.right_frame_temperatuur, text="Ondergrens (C°):", fg="black", anchor='w', bg="white")
+        self.label_tempbovengrens = Label(self.right_frame_temperatuur, text="Bovengrens (C°):", fg="black", anchor='w', bg="white")
         self.label_lichtondergrens = Label(self.right_frame_temperatuur, text="Ondergrens:", fg="black", anchor='w', bg="white")
-
+        self.label_lichtbovengrens = Label(self.right_frame_temperatuur, text="Bovengrens:", fg="black", anchor='w', bg="white")
 
         # dropdown menu voor temperatuur
         self.ondergrenstemp = ttk.Combobox(self.right_frame_temperatuur, state="readonly", width=4, height=50,
                                            values=[3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, ])
         self.ondergrenstemp.current(0)
 
+        self.bovengrenstemp = ttk.Combobox(self.right_frame_temperatuur, state="readonly", width=4, height=50,
+                                           values=[3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, ])
+        self.bovengrenstemp.current(17)
+
         # dropdown menu voor licht
         self.ondergrenslicht = ttk.Combobox(self.right_frame_temperatuur, state="readonly", width=4, height=50,
                                             values=[3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, ])
         self.ondergrenslicht.current(0)
+
+        self.bovengrenslicht = ttk.Combobox(self.right_frame_temperatuur, state="readonly", width=4, height=50,
+                                            values=[3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, ])
+        self.bovengrenslicht.current(17)
 
         # Packs
         self.label_temp.pack(side=TOP, padx=(30, 30), pady=(20, 0), fill='both')
         self.button_home.pack(side=BOTTOM, padx=(950, 30), pady=(20, 20))
         self.label_tempondergrens.pack(side=TOP, padx=(30, 30), pady=(20, 20), fill='both')
         self.ondergrenstemp.place(x=150, y=80)
+        self.bovengrenstemp.place(x=150, y=140)
+        self.label_tempbovengrens.pack(side=TOP, padx=(30, 30), pady=(20, 20), fill='both')
         self.label_licht.pack(side=TOP, padx=(30, 30), pady=(20, 0), fill='both')
         self.label_lichtondergrens.pack(side=TOP, padx=(30, 30), pady=(20, 20), fill='both')
-        self.ondergrenslicht.place(x=150, y=195)
-
+        self.label_lichtbovengrens.pack(side=TOP, padx=(30, 30), pady=(20, 20), fill='both')
+        self.ondergrenslicht.place(x=150, y=260)
+        self.bovengrenslicht.place(x=150, y=320)
 
     def makeRolluikFrame(self):
         # labels
@@ -266,4 +292,4 @@ class Gui:
 
 root = Tk()  # make instance of tkinter
 gui = Gui(root)
-
+root.mainloop()  # infinite loop to keep gui running
