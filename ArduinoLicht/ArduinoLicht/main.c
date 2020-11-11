@@ -136,7 +136,7 @@ void GeelLEDuit(){
 }
 
 // Bereken de lichtintensiteit
-void tempsensor(void){
+void lichtsensor(void){
 	lichtintensiteit = readAdc(0);
 	_delay_ms(10);
 }
@@ -253,13 +253,11 @@ void run(void){
 		// Uitrollen
 		if(data == 0x40){
 			schermuitrollen(); // zet uitrol naar de current uitrolafstand, schrijf dit naar eeprom (0x04)
-			//transmit(uitrol) // stuur data terug?
 		}
 		
 		// Oprollen
 		if(data == 0x50){
 			schermoprollen(); // zet uitrol naar de current uitrolafstand, schrijf dit naar eeprom (0x04)
-			//transmit(uitrol)// stuur data terug?
 		}
 		
 		// Stuur huidige min en max uitrol
@@ -297,7 +295,7 @@ void run(void){
 			isBusy = 0;
 		}
 		
-		// Verstuur de temperatuur
+		// Verstuur de lichtintensiteit (Python request elke 60seconden)
 		if(data == 0xa0){
 			transmit(lichtintensiteit);
 		}
@@ -343,7 +341,7 @@ int main(void){
 	
 	// Voeg tasks toe aan de scheduler
 	//SCH_Add_Task(run, 0, 1);
-	SCH_Add_Task(tempsensor,1000, 1000); 
+	SCH_Add_Task(lichtsensor,1000, 1000); 
 	//SCH_Add_Task(getDistance,1200,1000); // Ultrasoon sensor niet geimplementeerd
 	SCH_Add_Task(rol,500,3000); // tijd verkort voor testing purposes
 	

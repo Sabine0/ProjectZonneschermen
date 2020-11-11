@@ -265,13 +265,11 @@ void run(void){
 		// Uitrollen
 		if(data == 0x40){
 			schermuitrollen(); // zet uitrol naar de current uitrolafstand, schrijf dit naar eeprom (0x04)
-			//transmit(uitrol) // stuur data terug?
 		}
 		
 		// Oprollen
 		if(data == 0x50){
 			schermoprollen(); // zet uitrol naar de current uitrolafstand, schrijf dit naar eeprom (0x04)
-			//transmit(uitrol)// stuur data terug?
 		}
 		
 		// Stuur huidige min en max uitrol
@@ -309,7 +307,7 @@ void run(void){
 			isBusy = 0;
 		}
 		
-		// Verstuur de temperatuur
+		// Verstuur de temperatuur (Python request elke 60seconden)
 		if(data == 0xa0){
 			transmit(temperatuur);
 		}
