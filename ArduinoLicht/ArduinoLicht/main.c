@@ -1,10 +1,11 @@
 /*
- * projectzonneschermen.c
+ * ArduinoLicht.c
  *
- * Created: 09/11/2020 17:29:40
+ * Created: 09/11/2020 17:29:41
  * Author : Sabine
  * Deze code werkt alleen autonoom en is nog niet getest met GUI.
  */ 
+
 
 #include "AVR_TTC_scheduler.h"
 #include <avr/io.h>
@@ -19,25 +20,21 @@ volatile uint8_t status = 0x01;
 volatile uint8_t min_uitrol = 5;
 volatile uint8_t max_uitrol = 160;
 volatile uint8_t uitrol = 0;
-volatile uint8_t max_licht = 200;
-volatile uint8_t max_temp = 70;
+volatile uint8_t max_licht = 25;
+volatile uint8_t lichtintensiteit = 0;
 volatile uint8_t adcValue = 0;
-volatile uint8_t licht = 0;
-volatile uint8_t test = 0;
-volatile uint8_t rollen = 0;
-volatile uint8_t count = 0;
-volatile uint8_t pulse = 0;
-volatile int16_t COUNTB = 0;
-volatile float volt = 0;
-volatile float temp = 0;
-volatile uint8_t temperatuur = 0;
+volatile uint8_t isBusy = 0;
+volatile uint8_t isRolling = 0;
+//volatile uint8_t pulse = 0; // wordt alleen gebruikt voor ultrasoon sensor
+//volatile int16_t COUNTB = 0; //wordt alleen gebruikt voor ultrasoon sensor
+
 
 void setup() {
-	DDRD = 0xFF;
-	DDRB = 0xFF;
+	DDRD = 0xFF; // pin 2,3,4
+	DDRB = 0xFF; // wordt niet gebruikt
 }
 
-// Zet de waarden voor de serieele verbinding (baudrate UBRR)
+// Zet de waarden voor de serieele verbinding
 // Dit komt uit de datasheet
 void uart_init(){
 	UBRR0H = 0;
@@ -63,8 +60,7 @@ uint8_t receive(void) {
 ADMUX is the ADC multiplexer selection register (register that contains three fields of bits for 
 controlling various aspects of data conversion)
 ADCSRA is the ADC control and status register A
-ADCH is the ADC Data register high byte
-ADCL is the ADC Data register low byte
+
 ADPS0 = 0 (ADC Prescaler select bits)
 ADPS1 = 1 (ADC Prescaler select bits)
 ADPS2 = 2 (ADC Prescaler select bits)
@@ -97,9 +93,7 @@ void set_eeprom_address(){
 	eeprom_write_byte(0x03, max_uitrol);
 	eeprom_write_byte(0x04, uitrol);
 	eeprom_write_byte(0x05, max_licht);
-	eeprom_write_byte(0x06, max_temp);
-	eeprom_write_byte(0x08, licht);
-	eeprom_write_byte(0x09, count);
+	eeprom_write_byte(0x06, lichtintensiteit);
    }
    
 void get_eeprom(){
@@ -108,9 +102,7 @@ void get_eeprom(){
 	max_uitrol = eeprom_read_byte(0x03);
 	uitrol = eeprom_read_byte(0x04);
 	max_licht = eeprom_read_byte(0x05);
-	max_temp = eeprom_read_byte(0x06);
-	licht = eeprom_read_byte(0x08);
-	count = eeprom_read_byte(0x09);
+	lichtintensiteit = eeprom_read_byte(0x06);
    }
 
 // De rode LED aanzetten op Poort D pin 3 ( 8 = 0000 1000)
@@ -143,29 +135,19 @@ void GeelLEDuit(){
 	PORTD &=~ 16;
 }
 
-// Temperatuur berekenen in celcius
-// 10mV = 1Celcius
+// Bereken de lichtintensiteit
 void tempsensor(void){
-	//zet reading value 'ADC' in variabele 'value';
-	float value = readAdc(1);
+	lichtintensiteit = readAdc(0);
 	_delay_ms(10);
-	//formule voor volt is: reading value * 5.0 / 1024;
-	volt = (value / 255) * 5;
-
-	//formule voor temp is: (voltage - 0.5) * 100;
-	temp = (volt - 0.5) * 100;
-
-	temperatuur = temp;
 }
 
 // Laat de rode LED branden en de gele LED knipperen
 void schermoprollen(){
-	rollen = 1;
-	if(PORTD == 0x04) {
+	isRolling = 1;
+	if(PORTD == 0x04) { // check of groen nog aan staat, zo ja zet hem uit
 		GroenLEDuit();
 	}
 	RoodLEDaan();
-	
 		while(uitrol > min_uitrol){
 			GeelLEDaan();
 			_delay_ms(500);
@@ -179,17 +161,16 @@ void schermoprollen(){
 				eeprom_write_byte(0x04, uitrol);
 			}
 		}
-	rollen = 0;
+	isRolling = 0;
 }
 
 // Laat de groene LED branden en de gele LED knipperen
 void schermuitrollen(){
-	rollen = 1;
-	if(PORTD == 0x08 ) { // check of rood nog aan staat
+	isRolling = 1;
+	if(PORTD == 0x08 ) { // check of rood nog aan staat, zo ja zet hem uit
 		RoodLEDuit();
 	}
 	GroenLEDaan();
-
 		while(uitrol < max_uitrol) {
 			GeelLEDaan();
 			_delay_ms(500);
@@ -204,7 +185,7 @@ void schermuitrollen(){
 				eeprom_write_byte(0x04, uitrol);
 			}
 		}	
-	rollen = 0;
+	isRolling = 0;
 }
 
 /* WE HEBBEN GEEN ULTRASOON SENSOR
@@ -235,126 +216,128 @@ void getDistance(void){
 
 // Rol het scherm automatisch in of uit
 void rol(){
-	if(status == 1 & rollen == 0){
-		if(licht > max_licht){
-			schermuitrollen();
+	if((status == 1) & (isRolling == 0)){
+		if(lichtintensiteit > max_licht){
+			schermuitrollen(); // Groen
 		}else{
-			schermoprollen();
+			schermoprollen(); // Rood
 		}		
 	}
 }
 
 void run(void){
-	if(test == 0){
+	if(isBusy == 0){
 		uint8_t data = receive();
 		// Verstuur het type eenheid
 		if(data == 0xff){
 			transmit(0xd0); // Lichtsensor
 		}
+		
 		// Verstuur de status
 		if(data == 0x10){
 			transmit(status);  // 0= handmatig, 1= autonoom
 		}
+		
 		//  Zet de status op handmatig
 		if(data == 0x20){
 			status = 0x00; // handmatig
 			eeprom_write_byte(0x01, status);
 		}
+		
 		// Zet de status op autonoom
 		if(data == 0x30){
 			status = 0x01; // autonoom
 			eeprom_write_byte(0x01, status);
 		}
+		
 		// Uitrollen
 		if(data == 0x40){
 			schermuitrollen(); // zet uitrol naar de current uitrolafstand, schrijf dit naar eeprom (0x04)
-			// stuur data terug?
+			//transmit(uitrol) // stuur data terug?
 		}
+		
 		// Oprollen
 		if(data == 0x50){
 			schermoprollen(); // zet uitrol naar de current uitrolafstand, schrijf dit naar eeprom (0x04)
-			// stuur data terug?
+			//transmit(uitrol)// stuur data terug?
 		}
 		
 		// Stuur huidige min en max uitrol
 		if(data == 0x60){
-			transmit(max_uitrol);
 			transmit(min_uitrol);
+			transmit(max_uitrol);
 		}
-		// Stuur huidige max li
+		
+		// Stuur huidige max licht
 		if(data == 0x70){
 			transmit(max_licht);
 		}
+		
 		// Stel de maximale uitrol in
 		if(data == 0x80){
-			test = 1;
+			isBusy = 1;
 			max_uitrol = receive();
 			eeprom_write_byte(0x03, max_uitrol);
-			test = 0;
+			isBusy = 0;
 		}
+		
 		// Stel de minimale uitrol in
 		if(data == 0x81){
-			test = 1;
+			isBusy = 1;
 			min_uitrol = receive();
 			eeprom_write_byte(0x02, min_uitrol);
-			test = 0;
+			isBusy = 0;
 		}
 		
-		/* Niet relevant voor de lichtsensor
-		// Stel de temperatuur in waarbij uitgerold moet worden
+		// Stel de lichtintensiteit in waarbij uitgerold moet worden
 		if(data == 0x82){
-			test = 1;
-			max_temp = receive();
-			eeprom_write_byte(0x06, max_temp);
-			test = 0;
+			isBusy = 1;
+			max_licht = receive();
+			eeprom_write_byte(0x05, max_licht);
+			isBusy = 0;
 		}
-		*/
 		
-		// Verstuur de lichtintensiteit en count
+		// Verstuur de temperatuur
 		if(data == 0xa0){
-			transmit(licht);
-			transmit(count);
+			transmit(lichtintensiteit);
 		}
+		
 		// verstuur de uitrol (hoe ver het scherm op het moment is uitgerold)
 		if(data == 0xb0){
 			transmit(uitrol);
 		}
-		// Verstuur de lichtintensiteit en maximale lichtintensiteit voor uitrollen
-		// Weet niet of je dit nodig gaat hebben
+		
+		// Verstuur de lichtintensiteit en huidige maximale licht om uit te rollen
 		if(data == 0xc0){
-			transmit(licht);
+			transmit(lichtintensiteit);
 			transmit(max_licht);
 		}
 	}
 }
 
 int main(void){
-
-	if(eeprom_read_byte(0x00) != 0x01){
-		set_eeprom_address();
+	if(eeprom_read_byte(0x00) != 0x01){ // check of er nog geen data is
+		set_eeprom_address(); //vul EEPROM met de volatile variabelen
 	}
 	else{
-		get_eeprom();
+		get_eeprom(); //als er al wel waarden waren, haal ze op en zet ze in de volatile variabelen
 	}
 	
 	// Set up de ports
 	setup();
 	
-	// Initialise communicatie
+	// Initialise communicatie en ADC
 	uart_init();
 	adc_init();
 	
-	//Voor testen
-	//RoodLEDuit();
-	//GroenLEDuit();
-	//GeelLEDuit();
-	
-	rollen=0;
+	//tests
+	//if lichtintensiteit>max_licht: schermuitrollen
+	//schermuitrollen == Green
+	//schermoprollen == Red
+	isRolling=0;
 	status=1;
-	
-	//Hoger = groen, lager = rood
-	max_licht = 400;
-	licht = 200;
+	max_licht = 100;
+	lichtintensiteit = 200;
 	
 	SCH_Init_T1(); // Initialise de timer, default 10ms
 	
@@ -362,7 +345,7 @@ int main(void){
 	//SCH_Add_Task(run, 0, 1);
 	SCH_Add_Task(tempsensor,1000, 1000); 
 	//SCH_Add_Task(getDistance,1200,1000); // Ultrasoon sensor niet geimplementeerd
-	SCH_Add_Task(rol,500,3000); //4000
+	SCH_Add_Task(rol,500,3000); // tijd verkort voor testing purposes
 	
 	SCH_Start(); // De scheduler starten
 	
